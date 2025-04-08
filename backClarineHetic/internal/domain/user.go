@@ -12,4 +12,7 @@ type User struct {
 type UserRepository interface {
     Create(user *User) error
     FindByEmail(email string) (*User, error)
+    FindByID(id uuid.UUID) (*User, error)
+    Delete(id uuid.UUID) error
+    Update(user *User) error
 }

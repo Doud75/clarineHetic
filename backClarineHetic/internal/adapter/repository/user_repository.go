@@ -4,6 +4,7 @@ import (
     "backClarineHetic/internal/domain"
     "database/sql"
     "errors"
+
     "github.com/google/uuid"
 )
 
@@ -33,4 +34,29 @@ func (r *PostgresUserRepo) FindByEmail(email string) (*domain.User, error) {
         return nil, err
     }
     return user, nil
+}
+
+func (r *PostgresUserRepo) GetByID(id uuid.UUID) (*domain.User, error) {
+    query := `SELECT uuid, username, email, password FROM users WHERE uuid = $1`
+    row := r.db.QueryRow(query, id)
+    user := &domain.User{}
+    if err := row.Scan(&user.UUID, &user.Username, &user.Email, &user.Password); err != nil {
+        if errors.Is(err, sql.ErrNoRows) {
+            return nil, errors.New("utilisateur non trouvé")
+        }
+        return nil, err
+    }
+    return user, nil
+}
+
+func (r *PostgresUserRepo) Update(user *domain.User) error {
+    query := `UPDATE users SET username = $1, email = $2, password = $3 WHERE uuid = $4`
+    _, err := r.db.Exec(query, user.Username, user.Email, user.Password, user.UUID)
+    return err
+}
+
+func (r *PostgresUserRepo) Delete(id uuid.UUID) error {
+    query := `DELETE FROM users WHERE uuid = $1`
+    _, err := r.db.Exec(query, id)
+    return err
 }
