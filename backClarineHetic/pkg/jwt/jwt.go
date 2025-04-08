@@ -1,18 +1,40 @@
 package jwt
 
 import (
-    "github.com/golang-jwt/jwt/v4"
+    jwtLib "github.com/golang-jwt/jwt/v4"
     "time"
 )
+
+type CustomClaims struct {
+    Email string `json:"email"`
+    jwtLib.RegisteredClaims
+}
 
 var jwtKey = []byte("secret_key")
 
 func GenerateToken(email string) (string, error) {
-    claims := &jwt.RegisteredClaims{
-        Subject:   email,
-        ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
-        IssuedAt:  jwt.NewNumericDate(time.Now()),
+    claims := &CustomClaims{
+        Email: email,
+        RegisteredClaims: jwtLib.RegisteredClaims{
+            Subject:   email,
+            ExpiresAt: jwtLib.NewNumericDate(time.Now().Add(24 * time.Hour)),
+            IssuedAt:  jwtLib.NewNumericDate(time.Now()),
+        },
     }
-    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+    token := jwtLib.NewWithClaims(jwtLib.SigningMethodHS256, claims)
     return token.SignedString(jwtKey)
+}
+
+func ValidateToken(tokenStr string) (*CustomClaims, error) {
+    token, err := jwtLib.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwtLib.Token) (interface{}, error) {
+        return jwtKey, nil
+    })
+    if err != nil {
+        return nil, err
+    }
+
+    if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
+        return claims, nil
+    }
+    return nil, err
 }

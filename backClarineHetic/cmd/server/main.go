@@ -4,6 +4,7 @@ import (
     "backClarineHetic/internal/adapter/controller"
     "backClarineHetic/internal/adapter/repository"
     "backClarineHetic/internal/adapter/router"
+    "backClarineHetic/internal/middleware"
     "backClarineHetic/internal/usecase"
     "database/sql"
     "log"
@@ -15,7 +16,6 @@ import (
 )
 
 func main() {
-    // Charger les variables d'environnement
     if err := godotenv.Load(); err != nil {
         log.Println("Pas de fichier .env trouvé, utilisation des variables d'environnement existantes")
     }
@@ -57,6 +57,9 @@ func main() {
     profileController := controller.NewProfileController(profileUC)
 
     r := gin.Default()
+
+    r.Use(middleware.JWTAuthMiddleware())
+
     router.NewAuthRouter(r, authController)
     router.NewProfileRouter(r, profileController)
     if err := r.Run(":9070"); err != nil {
