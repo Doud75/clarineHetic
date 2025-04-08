@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "jsx": "react-jsx",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "allowImportingTsExtensions": true,
+    "types": [
+      "react",
+      "react-native"
+    ],
+    "paths": {
+      "@react-navigation/native": [
+        "./node_modules/@react-navigation/native/lib/typescript/src/index.d.ts"
+      ],
+      "@react-navigation/native-stack": [
+        "./node_modules/@react-navigation/native-stack/lib/typescript/src/index.d.ts"
+      ]
+    }
+  },
+  "extends": "expo/tsconfig.base"
+}

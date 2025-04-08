@@ -1,0 +1,31 @@
+# Ignorer les binaires générés
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Fichiers générés par 'go test'
+*.test
+
+# Fichiers de couverture générés par 'go test -cover'
+*.out
+
+# Dossier des dépendances vendorisées (si vous utilisez vendoring)
+vendor/
+
+# Dossier de build (si vous en avez un)
+bin/
+
+# Fichiers temporaires ou caches d'IDE
+.idea/
+.vscode/
+*.swp
+*.tmp
+
+# Fichiers spécifiques à Go (si vous utilisez des workspaces)
+go.work
+go.work.sum
+
+# Fichiers d'environnement (à personnaliser selon vos besoins)
+.env
