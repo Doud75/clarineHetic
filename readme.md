@@ -49,7 +49,3 @@
     - Visualisation des événements sur une carte géolocalisée
     - Recherche et filtrage des événements par localisation
     - Interaction avec les marqueurs sur la carte
-
-- **Navigation et Ergonomie :**
-    - Menu de navigation intuitif (barre inférieure ou hamburger)
-    - Accès rapide aux principales fonctionnalités (messagerie, événements, carte)
