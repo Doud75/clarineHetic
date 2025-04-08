@@ -1,6 +1,5 @@
 import Constants from 'expo-constants';
 const { API_URL } = Constants.expoConfig?.extra || { API_URL: 'http://localhost:9070' };
-console.log('API_URL:', API_URL);
 
 export interface AuthResponse {
     token: string;

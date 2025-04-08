@@ -21,9 +21,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
         try {
             const response = await signup(username, email, password);
             setToken(response.token);
-            Alert.alert('Succès', `Inscription réussie ! Token: ${response.token}`);
-            // Ici, tu peux naviguer vers l'écran principal, par exemple :
-            // navigation.navigate('Home');
+            navigation.navigate('Home');
         } catch (error: any) {
             Alert.alert('Erreur', error.message);
         }
