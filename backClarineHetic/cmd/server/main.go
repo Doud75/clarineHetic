@@ -53,8 +53,12 @@ func main() {
     authUC := usecase.NewAuthUsecase(userRepo)
     authController := controller.NewAuthController(authUC)
 
+    profileUC := usecase.NewProfileUseCase(userRepo)
+    profileController := controller.NewProfileController(profileUC)
+
     r := gin.Default()
     router.NewAuthRouter(r, authController)
+    router.NewProfileRouter(r, profileController)
     if err := r.Run(":9070"); err != nil {
         log.Fatalf("Erreur lors du démarrage du serveur : %v", err)
     }

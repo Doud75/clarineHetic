@@ -60,3 +60,32 @@ func (r *PostgresUserRepo) Delete(id uuid.UUID) error {
     _, err := r.db.Exec(query, id)
     return err
 }
+
+func (r *PostgresUserRepo) SearchProfiles(searchTerm string) ([]*domain.User, error) {
+    query := `
+		SELECT DISTINCT u.uuid, u.username, u.email, u.password
+		FROM users u
+		LEFT JOIN instrument_users iu ON u.uuid = iu.user_id
+		LEFT JOIN instruments i ON i.uuid = iu.instrument_id
+		WHERE u.username ILIKE '%' || $1 || '%'
+		   OR i.name ILIKE '%' || $1 || '%'
+	`
+    rows, err := r.db.Query(query, searchTerm)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var users []*domain.User
+    for rows.Next() {
+        var user domain.User
+        if err = rows.Scan(&user.UUID, &user.Username, &user.Email, &user.Password); err != nil {
+            return nil, err
+        }
+        users = append(users, &user)
+    }
+    if err = rows.Err(); err != nil {
+        return nil, err
+    }
+    return users, nil
+}
