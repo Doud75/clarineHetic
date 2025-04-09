@@ -15,4 +15,5 @@ type Message struct {
 
 type MessageRepository interface {
     Create(message *Message) error
+    GetMessagesByConversationID(conversationID uuid.UUID) ([]*Message, error)
 }

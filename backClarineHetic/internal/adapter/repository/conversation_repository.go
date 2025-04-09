@@ -36,6 +36,25 @@ func (r *PostgresConversationRepo) GetByID(id uuid.UUID) (*domain.Conversation, 
     return convo, nil
 }
 
+func (r *PostgresConversationRepo) GetByUserIDs(authUserUUID uuid.UUID, userUUID uuid.UUID) (*domain.Conversation, error) {
+    query := `
+        SELECT uuid, user_id_a, user_id_b 
+        FROM conversations 
+        WHERE (user_id_a = $1 AND user_id_b = $2)
+           OR (user_id_a = $2 AND user_id_b = $1)
+    `
+    row := r.db.QueryRow(query, authUserUUID, userUUID)
+
+    convo := &domain.Conversation{}
+    if err := row.Scan(&convo.UUID, &convo.UserIDA, &convo.UserIDB); err != nil {
+        if errors.Is(err, sql.ErrNoRows) {
+            return nil, errors.New("conversation non trouvée")
+        }
+        return nil, err
+    }
+    return convo, nil
+}
+
 func (r *PostgresConversationRepo) Update(convo *domain.Conversation) error {
     query := `UPDATE conversations SET user_id_a = $1, user_id_b = $2 WHERE uuid = $3`
     _, err := r.db.Exec(query, convo.UserIDA, convo.UserIDB, convo.UUID)

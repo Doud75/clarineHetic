@@ -6,15 +6,17 @@ import (
 )
 
 type CustomClaims struct {
-    Email string `json:"email"`
+    Email    string `json:"email"`
+    UserUUID string `json:"user_uuid"`
     jwtLib.RegisteredClaims
 }
 
 var jwtKey = []byte("secret_key")
 
-func GenerateToken(email string) (string, error) {
+func GenerateToken(email string, userUUID string) (string, error) {
     claims := &CustomClaims{
-        Email: email,
+        Email:    email,
+        UserUUID: userUUID,
         RegisteredClaims: jwtLib.RegisteredClaims{
             Subject:   email,
             ExpiresAt: jwtLib.NewNumericDate(time.Now().Add(24 * time.Hour)),

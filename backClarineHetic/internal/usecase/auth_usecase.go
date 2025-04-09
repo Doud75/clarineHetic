@@ -31,7 +31,7 @@ func (a *authUsecase) Signup(user *domain.User) (string, error) {
         return "", err
     }
 
-    token, err := jwt.GenerateToken(user.Email)
+    token, err := jwt.GenerateToken(user.Email, user.UUID.String())
     if err != nil {
         return "", err
     }
@@ -46,7 +46,7 @@ func (a *authUsecase) Login(email, password string) (string, error) {
     if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
         return "", errors.New("identifiants invalides")
     }
-    token, err := jwt.GenerateToken(user.Email)
+    token, err := jwt.GenerateToken(user.Email, user.UUID.String())
     if err != nil {
         return "", err
     }

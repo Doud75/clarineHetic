@@ -12,7 +12,6 @@ type profileUseCase struct {
     userRepo domain.UserRepository
 }
 
-// NewProfileUseCase crée une nouvelle instance de ProfileUseCase.
 func NewProfileUseCase(userRepo domain.UserRepository) ProfileUseCase {
     return &profileUseCase{
         userRepo: userRepo,

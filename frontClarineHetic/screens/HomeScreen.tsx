@@ -1,4 +1,3 @@
-// frontClarineHetic/screens/HomeScreen.tsx
 import React, { useState } from 'react';
 import {
     View,
@@ -8,9 +7,12 @@ import {
     StyleSheet,
     TextInput,
     Button,
+    TouchableOpacity
 } from 'react-native';
 import { useAuthStore } from '../store/useAuthStore';
 import { searchProfiles } from '../services/profileService';
+import {NativeStackScreenProps} from "@react-navigation/native-stack";
+import {RootStackParamList} from "../navigation/AppNavigator.tsx";
 
 interface User {
     uuid: string;
@@ -18,13 +20,13 @@ interface User {
     email: string;
 }
 
-const HomeScreen = () => {
+type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
+
+const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
-
-    // On récupère le token depuis le store d'authentification
     const token = useAuthStore((state) => state.token);
 
     const handleSearch = async () => {
@@ -32,7 +34,6 @@ const HomeScreen = () => {
         setError('');
         try {
             const data = await searchProfiles(searchTerm, token);
-            // On suppose que la réponse est sous la forme { data: [...] }
             setUsers(data.data);
         } catch (err: any) {
             setError(err.message);
@@ -40,6 +41,16 @@ const HomeScreen = () => {
             setLoading(false);
         }
     };
+
+    const renderItem = ({ item }: { item: User }) => (
+        <TouchableOpacity
+            style={styles.item}
+            onPress={() => navigation.navigate('Conversation', { user: item })}
+        >
+            <Text style={styles.username}>{item.username}</Text>
+            <Text>{item.email}</Text>
+        </TouchableOpacity>
+    );
 
     return (
         <View style={styles.container}>
@@ -60,12 +71,7 @@ const HomeScreen = () => {
                 <FlatList
                     data={users}
                     keyExtractor={(item) => item.uuid}
-                    renderItem={({ item }) => (
-                        <View style={styles.item}>
-                            <Text style={styles.username}>{item.username}</Text>
-                            <Text>{item.email}</Text>
-                        </View>
-                    )}
+                    renderItem={renderItem}
                 />
             )}
         </View>

@@ -36,6 +36,27 @@ func (r *PostgresMessageRepo) GetByID(id uuid.UUID) (*domain.Message, error) {
     return message, nil
 }
 
+func (r *PostgresMessageRepo) GetMessagesByConversationID(conversationID uuid.UUID) ([]*domain.Message, error) {
+    query := `SELECT uuid, content, insert_at, user_id, conversation_id FROM messages where conversation_id = $1`
+    rows, err := r.db.Query(query, conversationID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+    var messages []*domain.Message
+    for rows.Next() {
+        var message domain.Message
+        if err = rows.Scan(&message.UUID, &message.Content, &message.InsertAt, &message.UserID, &message.ConversationId); err != nil {
+            return nil, err
+        }
+        messages = append(messages, &message)
+    }
+    if err = rows.Err(); err != nil {
+        return nil, err
+    }
+    return messages, nil
+}
+
 func (r *PostgresMessageRepo) Update(message *domain.Message) error {
     query := `UPDATE messages SET content = $1, insert_at = $2, user_id = $3, conversation_id = $4 WHERE uuid = $5`
     _, err := r.db.Exec(query, message.Content, message.InsertAt, message.UserID, message.ConversationId, message.UUID)
