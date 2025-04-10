@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -12,7 +12,7 @@ import {
 import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/useAuthStore';
 import { searchProfiles } from '../services/profileService';
-import { CompositeNavigationProp, useNavigation } from '@react-navigation/native';
+import { CompositeNavigationProp, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainTabParamList } from '../navigation/MainTabNavigator';
@@ -51,6 +51,16 @@ const HomeScreen: React.FC = () => {
             setLoading(false);
         }
     };
+
+    useFocusEffect(
+        useCallback(() => {
+            setSearchTerm('');
+            setUsers([]);
+            setError('');
+            return () => {
+            };
+        }, [])
+    );
 
     const renderItem = ({ item }: { item: User }) => (
         <TouchableOpacity

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
 import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context';
 import { fetchEvents } from '../services/eventService';
 import { useAuthStore } from '../store/useAuthStore';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface Event {
   uuid: string;
@@ -31,7 +32,6 @@ const JamScreen: React.FC = () => {
   const [error, setError] = useState<string>('');
   const token = useAuthStore((state) => state.token) ?? '';
 
-  // Fonction pour récupérer les événements
   const getEvents = async (term: string) => {
     setLoading(true);
     setError('');
@@ -44,10 +44,15 @@ const JamScreen: React.FC = () => {
       setLoading(false);
     }
   };
-  
-  useEffect(() => {
-    getEvents('');
-  }, [token]);
+
+  useFocusEffect(
+      useCallback(() => {
+        setSearchTerm('');
+        setEvents([]);
+        setError('');
+        getEvents('');
+      }, [token])
+  );
 
   const handleSearch = () => {
     getEvents(searchTerm);
