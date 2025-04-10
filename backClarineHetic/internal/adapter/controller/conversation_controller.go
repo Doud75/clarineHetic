@@ -4,7 +4,6 @@ import (
     "backClarineHetic/internal/adapter/dto"
     "backClarineHetic/internal/domain"
     "backClarineHetic/internal/usecase"
-    "fmt"
     "github.com/gin-gonic/gin"
     "github.com/google/uuid"
     "net/http"
@@ -87,8 +86,6 @@ func (cc *conversationController) SaveMessage(c *gin.Context) {
         UserID:         authUserUUID,
         ConversationId: uuidParam,
     }
-
-    fmt.Println(req)
 
     if err = cc.conversationUseCase.SaveMessage(&message); err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

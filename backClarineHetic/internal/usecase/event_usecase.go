@@ -6,6 +6,7 @@ import (
 
 type EventUseCase interface {
     GetEvent(searchTerm string) ([]*domain.Event, error)
+    CreateEvent(event *domain.Event) error
 }
 
 type eventUseCase struct {
@@ -23,4 +24,8 @@ func (e *eventUseCase) GetEvent(searchTerm string) ([]*domain.Event, error) {
         return e.eventRepo.GetEvent()
     }
     return e.eventRepo.GetEventWithTerm(searchTerm)
+}
+
+func (e *eventUseCase) CreateEvent(event *domain.Event) error {
+    return e.eventRepo.Create(event)
 }

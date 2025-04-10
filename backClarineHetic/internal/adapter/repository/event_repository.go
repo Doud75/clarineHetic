@@ -19,7 +19,7 @@ func NewPostgresEventRepo(db *sql.DB) *PostgresEventRepo {
 func (r *PostgresEventRepo) Create(event *domain.Event) error {
     event.UUID = uuid.New()
     query := `INSERT INTO events (uuid, name, longitude, latitude, adress, city, start_date, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
-    _, err := r.db.Exec(query, event.UUID, event.Name, event.Longitude, event.Latitude, event.Adress, event.City, event.StartDate, event.UserID)
+    _, err := r.db.Exec(query, event.UUID, event.Name, "Longitude", "Latitude", event.Adress, event.City, event.StartDate, event.UserID)
     return err
 }
 
