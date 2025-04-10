@@ -61,6 +61,10 @@ func main() {
     conversationUC := usecase.NewConversationUseCase(conversationRepo, messageRepo)
     conversationController := controller.NewConversationController(conversationUC)
 
+    eventRepo := repository.NewPostgresEventRepo(db)
+    eventUC := usecase.NewEventUseCase(eventRepo)
+    eventController := controller.NewEventController(eventUC)
+
     r := gin.Default()
 
     r.Use(middleware.JWTAuthMiddleware())
@@ -68,6 +72,7 @@ func main() {
     router.NewAuthRouter(r, authController)
     router.NewProfileRouter(r, profileController)
     router.NewConversationRouter(r, conversationController)
+    router.NewEventRouter(r, eventController)
     if err := r.Run(":9070"); err != nil {
         log.Fatalf("Erreur lors du démarrage du serveur : %v", err)
     }

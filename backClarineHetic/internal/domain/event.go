@@ -15,3 +15,9 @@ type Event struct {
     StartDate time.Time `json:"start_date"`
     UserID    uuid.UUID `json:"user_id"`
 }
+
+type EventRepository interface {
+    Create(e *Event) error
+    GetEvent() ([]*Event, error)
+    GetEventWithTerm(searchTerm string) ([]*Event, error)
+}

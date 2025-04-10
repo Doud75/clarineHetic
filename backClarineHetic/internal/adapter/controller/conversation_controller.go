@@ -13,7 +13,7 @@ import (
 
 type ConversationController interface {
     GetConversation(ctx *gin.Context)
-    GetConversationByUuid(ctx *gin.Context)
+    SaveMessage(ctx *gin.Context)
 }
 
 type conversationController struct {
@@ -56,7 +56,7 @@ func (cc *conversationController) GetConversation(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"data": convResponse})
 }
 
-func (cc *conversationController) GetConversationByUuid(c *gin.Context) {
+func (cc *conversationController) SaveMessage(c *gin.Context) {
     var req dto.MessageRequest
     if err := c.ShouldBindJSON(&req); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Requête invalide", "details": err.Error()})

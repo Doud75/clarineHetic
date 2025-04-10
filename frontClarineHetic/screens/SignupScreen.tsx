@@ -21,7 +21,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
         try {
             const response = await signup(username, email, password);
             setToken(response.token);
-            navigation.navigate('Home');
+            navigation.navigate('Main');
         } catch (error: any) {
             Alert.alert('Erreur', error.message);
         }

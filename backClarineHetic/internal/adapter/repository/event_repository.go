@@ -5,6 +5,7 @@ import (
     "database/sql"
     "errors"
     "github.com/google/uuid"
+    "time"
 )
 
 type PostgresEventRepo struct {
@@ -45,4 +46,82 @@ func (r *PostgresEventRepo) Delete(id uuid.UUID) error {
     query := `DELETE FROM events WHERE uuid = $1`
     _, err := r.db.Exec(query, id)
     return err
+}
+
+func (r *PostgresEventRepo) GetEvent() ([]*domain.Event, error) {
+    threshold := time.Now().Add(-4 * time.Hour)
+    query := `
+        SELECT uuid, name, longitude, latitude, adress, city, start_date, user_id 
+        FROM events 
+        WHERE start_date > $1
+    `
+    rows, err := r.db.Query(query, threshold)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    events := []*domain.Event{}
+    for rows.Next() {
+        var event domain.Event
+        if err := rows.Scan(
+            &event.UUID,
+            &event.Name,
+            &event.Longitude,
+            &event.Latitude,
+            &event.Adress,
+            &event.City,
+            &event.StartDate,
+            &event.UserID,
+        ); err != nil {
+            return nil, err
+        }
+        events = append(events, &event)
+    }
+    if err = rows.Err(); err != nil {
+        return nil, err
+    }
+    return events, nil
+}
+
+func (r *PostgresEventRepo) GetEventWithTerm(searchTerm string) ([]*domain.Event, error) {
+    threshold := time.Now().Add(-4 * time.Hour)
+
+    query := `
+        SELECT uuid, name, longitude, latitude, adress, city, start_date, user_id
+        FROM events
+        WHERE start_date > $1
+          AND (
+              name ILIKE '%' || $2 || '%'
+              OR city ILIKE '%' || $2 || '%'
+              OR adress ILIKE '%' || $2 || '%'
+          )
+    `
+    rows, err := r.db.Query(query, threshold, searchTerm)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    events := []*domain.Event{}
+    for rows.Next() {
+        var event domain.Event
+        if err := rows.Scan(
+            &event.UUID,
+            &event.Name,
+            &event.Longitude,
+            &event.Latitude,
+            &event.Adress,
+            &event.City,
+            &event.StartDate,
+            &event.UserID,
+        ); err != nil {
+            return nil, err
+        }
+        events = append(events, &event)
+    }
+    if err = rows.Err(); err != nil {
+        return nil, err
+    }
+    return events, nil
 }

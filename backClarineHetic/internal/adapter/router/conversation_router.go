@@ -9,6 +9,6 @@ func NewConversationRouter(r *gin.Engine, ConversationController controller.Conv
     conversationGroup := r.Group("/conversation")
     {
         conversationGroup.GET("/", ConversationController.GetConversation)
-        conversationGroup.POST("/:uuid", ConversationController.GetConversationByUuid)
+        conversationGroup.POST("/:uuid", ConversationController.SaveMessage)
     }
 }

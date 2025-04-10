@@ -9,10 +9,14 @@ import {
     Button,
     TouchableOpacity
 } from 'react-native';
+import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/useAuthStore';
 import { searchProfiles } from '../services/profileService';
-import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../navigation/AppNavigator.tsx";
+import { CompositeNavigationProp, useNavigation } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MainTabParamList } from '../navigation/MainTabNavigator';
+import { RootStackParamList } from '../navigation/AppNavigator';
 
 interface User {
     uuid: string;
@@ -20,21 +24,27 @@ interface User {
     email: string;
 }
 
-type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
+type HomeScreenNavigationProp = CompositeNavigationProp<
+    BottomTabNavigationProp<MainTabParamList, 'Home'>,
+    NativeStackNavigationProp<RootStackParamList>
+>;
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+const HomeScreen: React.FC = () => {
+    const insets = useSafeAreaInsets();
     const [searchTerm, setSearchTerm] = useState('');
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
     const token = useAuthStore((state) => state.token);
 
+    const navigation = useNavigation<HomeScreenNavigationProp>();
+
     const handleSearch = async () => {
         setLoading(true);
         setError('');
         try {
             const data = await searchProfiles(searchTerm, token);
-            setUsers(data.data);
+            setUsers(data.data ?? []);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -53,32 +63,35 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     );
 
     return (
-        <View style={styles.container}>
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Rechercher un profil"
-                    value={searchTerm}
-                    onChangeText={setSearchTerm}
-                />
-                <Button title="Rechercher" onPress={handleSearch} />
+        <SafeAreaView style={[styles.safeArea, { paddingTop: insets.top }]}>
+            <View style={styles.container}>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Rechercher un profil"
+                        value={searchTerm}
+                        onChangeText={setSearchTerm}
+                    />
+                    <Button title="Rechercher" onPress={handleSearch} />
+                </View>
+
+                {loading && <ActivityIndicator size="large" color="#0000ff" />}
+                {error !== '' && <Text style={styles.error}>{error}</Text>}
+
+                {!loading && users.length > 0 && (
+                    <FlatList
+                        data={users}
+                        keyExtractor={(item) => item.uuid}
+                        renderItem={renderItem}
+                    />
+                )}
             </View>
-
-            {loading && <ActivityIndicator size="large" color="#0000ff" />}
-            {error !== '' && <Text style={styles.error}>{error}</Text>}
-
-            {!loading && users.length > 0 && (
-                <FlatList
-                    data={users}
-                    keyExtractor={(item) => item.uuid}
-                    renderItem={renderItem}
-                />
-            )}
-        </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    safeArea: { flex: 1, backgroundColor: '#fff' },
     container: { flex: 1, padding: 16, backgroundColor: '#fff' },
     inputContainer: {
         flexDirection: 'row',

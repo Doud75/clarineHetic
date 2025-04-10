@@ -20,7 +20,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         try {
             const response = await login(email, password);
             setToken(response.token);
-            navigation.navigate('Home');
+            navigation.navigate('Main');
         } catch (error: any) {
             Alert.alert('Erreur', error.message);
         }
